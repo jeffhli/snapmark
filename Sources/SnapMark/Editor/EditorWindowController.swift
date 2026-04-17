@@ -4,6 +4,7 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate, Toolba
     private let image: NSImage
     private var canvasView: CanvasView!
     private var toolbarView: ToolbarView!
+    private var scrollView: NSScrollView!
     var onClose: ((EditorWindowController) -> Void)?
 
     init(image: NSImage) {
@@ -56,8 +57,17 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate, Toolba
         // Canvas below toolbar
         canvasView = CanvasView(image: image)
         canvasView.delegate = self
-        canvasView.translatesAutoresizingMaskIntoConstraints = false
-        contentView.addSubview(canvasView)
+
+        scrollView = NSScrollView(frame: .zero)
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.hasVerticalScroller = true
+        scrollView.hasHorizontalScroller = true
+        scrollView.autohidesScrollers = true
+        scrollView.borderType = .noBorder
+        scrollView.backgroundColor = NSColor.windowBackgroundColor
+        scrollView.drawsBackground = true
+        scrollView.documentView = canvasView
+        contentView.addSubview(scrollView)
 
         NSLayoutConstraint.activate([
             toolbarView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -65,10 +75,10 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate, Toolba
             toolbarView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             toolbarView.heightAnchor.constraint(equalToConstant: Constants.toolbarHeight),
 
-            canvasView.topAnchor.constraint(equalTo: toolbarView.bottomAnchor),
-            canvasView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            canvasView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            canvasView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+            scrollView.topAnchor.constraint(equalTo: toolbarView.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
         ])
 
         window?.makeFirstResponder(canvasView)

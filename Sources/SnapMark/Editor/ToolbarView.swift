@@ -93,7 +93,9 @@ final class ToolbarView: NSView {
     private func createToolButton(tool: AnnotationTool) -> NSButton {
         let button = NSButton(frame: .zero)
         button.bezelStyle = .toolbar
-        button.isBordered = true
+        button.isBordered = false
+        button.wantsLayer = true
+        button.layer?.cornerRadius = 6
         if let img = NSImage(systemSymbolName: tool.sfSymbolName, accessibilityDescription: tool.rawValue) {
             button.image = img
         } else {
@@ -137,12 +139,11 @@ final class ToolbarView: NSView {
 
     private func updateToolSelection() {
         for (tool, button) in toolButtons {
-            button.state = tool == currentTool ? .on : .off
-            if tool == currentTool {
-                button.bezelColor = NSColor.controlAccentColor.withAlphaComponent(0.3)
-            } else {
-                button.bezelColor = nil
-            }
+            let selected = tool == currentTool
+            button.contentTintColor = selected ? .white : .secondaryLabelColor
+            button.layer?.backgroundColor = selected
+                ? NSColor.controlAccentColor.cgColor
+                : NSColor.clear.cgColor
         }
     }
 

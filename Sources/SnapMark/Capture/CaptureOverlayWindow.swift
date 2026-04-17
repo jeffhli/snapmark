@@ -18,8 +18,9 @@ final class CaptureOverlayWindow: NSWindow {
         self.ignoresMouseEvents = false
         self.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         self.acceptsMouseMovedEvents = true
+        self.isReleasedWhenClosed = false
 
-        let overlayView = CaptureOverlayView(frame: screen.frame)
+        let overlayView = CaptureOverlayView(frame: CGRect(origin: .zero, size: screen.frame.size))
         self.contentView = overlayView
     }
 

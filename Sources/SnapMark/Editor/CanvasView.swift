@@ -22,7 +22,7 @@ final class CanvasView: NSView {
 
     init(image: NSImage) {
         self.baseImage = image
-        super.init(frame: .zero)
+        super.init(frame: CGRect(origin: .zero, size: image.size))
     }
 
     @available(*, unavailable)
@@ -30,21 +30,16 @@ final class CanvasView: NSView {
 
     override var acceptsFirstResponder: Bool { true }
     override var isFlipped: Bool { false }
+    override var intrinsicContentSize: NSSize { baseImage.size }
 
     // MARK: - Drawing
 
     override func draw(_ dirtyRect: NSRect) {
         guard let context = NSGraphicsContext.current?.cgContext else { return }
 
-        // Draw base image
-        if let cgImage = baseImage.cgImage(forProposedRect: nil, context: nil, hints: nil) {
-            context.saveGState()
-            // Flip for CG drawing
-            context.translateBy(x: 0, y: bounds.height)
-            context.scaleBy(x: 1, y: -1)
-            context.draw(cgImage, in: CGRect(origin: .zero, size: bounds.size))
-            context.restoreGState()
-        }
+        // Draw base image using NSImage.draw which handles coordinate systems
+        // correctly in all NSView configurations without any manual flip transform.
+        baseImage.draw(in: bounds, from: .zero, operation: .copy, fraction: 1.0)
 
         // Draw annotations
         let scale = window?.backingScaleFactor ?? 1.0

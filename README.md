@@ -59,8 +59,32 @@ This produces `build/SnapMark.app`.
 **Debug build** (for development):
 
 ```bash
-swift build
+./scripts/run.sh
 ```
+
+`run.sh` now builds a debug `.app` bundle and opens it, instead of launching the raw SwiftPM executable.
+
+### Stable Signing for Screen Recording Permission
+
+macOS stores **Screen Recording** permission against the app's code signing identity. SnapMark now defaults to signing with the local certificate `SnapMark Local Code Signing`, which keeps the app identity stable across rebuilds on the same machine.
+
+Check that the local signing certificate exists:
+
+```bash
+security find-identity -p codesigning -v
+```
+
+If that identity is present, `./scripts/build.sh` and `./scripts/run.sh` will use it automatically.
+
+If you want to override the signing identity, you can still set `SIGN_IDENTITY` explicitly:
+
+```bash
+SIGN_IDENTITY="Apple Development: Your Name (TEAMID)" ./scripts/build.sh
+```
+
+If no matching signing identity is available, the build script falls back to ad-hoc signing. In that mode, macOS may ask for Screen Recording permission again after rebuilds because the app identity is not stable.
+
+For the most reliable behavior, move the signed app to `/Applications` and launch it from there.
 
 ### 4. Install
 
@@ -75,6 +99,8 @@ Or just double-click `build/SnapMark.app` to run it directly.
 ### 5. Grant Permissions
 
 On first launch, macOS will prompt for **Screen Recording** permission. You must grant this for screenshots to work.
+
+If macOS keeps prompting after every rebuild, check whether the app was built with the local signing certificate or fell back to ad-hoc signing. Always launch the `.app` bundle from `build/SnapMark.app`, not the raw binary in `.build/`.
 
 If you missed the prompt:
 
@@ -184,6 +210,8 @@ Sources/SnapMark/
 
 ### Screenshot is blank or shows wrong content
 Make sure Screen Recording permission is granted. Restart the app after granting permission.
+
+If the permission prompt appears after every rebuild, do not launch `.build/debug/SnapMark` directly. Launch `build/SnapMark.app` and sign it with `SIGN_IDENTITY="Apple Development: Your Name (TEAMID)"` when building.
 
 ### Hotkey doesn't work
 Another app may have registered `⌘⇧2`. Check System Settings → Keyboard → Keyboard Shortcuts for conflicts.

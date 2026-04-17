@@ -26,14 +26,17 @@ enum ImageExporter {
             bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
         ) else { return nil }
 
-        // Flip coordinate system for Core Graphics
+        // Flip coordinate system for drawing the base image (CG images need top-left origin)
+        context.saveGState()
         context.translateBy(x: 0, y: CGFloat(pixelHeight))
         context.scaleBy(x: 1, y: -1)
 
         // Draw base image
         let imageRect = CGRect(x: 0, y: 0, width: CGFloat(pixelWidth), height: CGFloat(pixelHeight))
         context.draw(cgBase, in: imageRect)
+        context.restoreGState()
 
+        // Draw annotations in non-flipped context (matching the canvas coordinate system)
         // Scale context for annotations (they use view coordinates)
         context.scaleBy(x: scale, y: scale)
 

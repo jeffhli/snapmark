@@ -1,9 +1,10 @@
 import AppKit
 
-final class EditorWindowController: NSWindowController, ToolbarDelegate, CanvasViewDelegate {
+final class EditorWindowController: NSWindowController, NSWindowDelegate, ToolbarDelegate, CanvasViewDelegate {
     private let image: NSImage
     private var canvasView: CanvasView!
     private var toolbarView: ToolbarView!
+    var onClose: ((EditorWindowController) -> Void)?
 
     init(image: NSImage) {
         self.image = image
@@ -36,6 +37,7 @@ final class EditorWindowController: NSWindowController, ToolbarDelegate, CanvasV
         window.isReleasedWhenClosed = false
 
         super.init(window: window)
+        window.delegate = self
         setupViews()
     }
 
@@ -111,5 +113,11 @@ final class EditorWindowController: NSWindowController, ToolbarDelegate, CanvasV
 
     func canvasDidUpdate(_ canvas: CanvasView) {
         // Could update toolbar state (enable/disable undo/redo) here
+    }
+
+    // MARK: - NSWindowDelegate
+
+    func windowWillClose(_ notification: Notification) {
+        onClose?(self)
     }
 }

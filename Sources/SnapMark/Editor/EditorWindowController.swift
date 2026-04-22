@@ -10,15 +10,14 @@ final class EditorWindowController: NSWindowController, NSWindowDelegate, Toolba
     init(image: NSImage) {
         self.image = image
 
-        // Calculate window size (fit image, cap at 80% of screen)
+        // Calculate window size at 1:1 image scale and rely on scrollbars for overflow.
         let screen = NSScreen.main ?? NSScreen.screens[0]
-        let maxW = screen.visibleFrame.width * 0.8
-        let maxH = screen.visibleFrame.height * 0.8
+        let maxW = screen.visibleFrame.width
+        let maxH = screen.visibleFrame.height - Constants.toolbarHeight
         let imgW = image.size.width
         let imgH = image.size.height
-        let scale = min(1.0, min(maxW / imgW, maxH / (imgH + Constants.toolbarHeight)))
-        let winW = imgW * scale
-        let winH = imgH * scale + Constants.toolbarHeight
+        let winW = min(imgW, maxW)
+        let winH = min(imgH, maxH) + Constants.toolbarHeight
 
         let contentRect = CGRect(
             x: (screen.visibleFrame.width - winW) / 2 + screen.visibleFrame.origin.x,

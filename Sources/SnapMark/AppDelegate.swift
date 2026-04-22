@@ -83,10 +83,6 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
         // Dismiss overlays FIRST so they don't appear in the screenshot
         dismissOverlays()
 
-        guard let targetScreen = NSScreen.screens.first(where: { $0.frame == screenFrame }) else {
-            return
-        }
-
         let appToRestore = previousFrontmostApplication
         previousFrontmostApplication = nil
 
@@ -101,7 +97,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             }
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                guard let image = ScreenCaptureManager.capture(rect: rect, on: targetScreen) else { return }
+                guard let image = ScreenCaptureManager.capture(rect: rect) else { return }
 
                 let controller = EditorWindowController(image: image)
                 controller.onClose = { [weak self] closedController in
